@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 
-const Signup = () => {
+const Superlogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -13,7 +13,7 @@ const Signup = () => {
     setMessage("");
 
     try {
-      const response = await fetch('https://ecommerce-backend-theta-pink.vercel.app/api/admin/login', {
+      const response = await fetch('https://albn-backend.vercel.app/api/superadmin/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -28,7 +28,7 @@ const Signup = () => {
         localStorage.setItem("isLogged", "true");
         setMessage("Login successful!");
         setTimeout(() => {
-          navigate("/admin/dashboard");
+          navigate("/superpanel");
         }, 1000);
       } else {
         setMessage(data.message || "Login failed");
@@ -48,8 +48,8 @@ const Signup = () => {
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5s-3 1.343-3 3 1.343 3 3 3zm0 2c-2.67 0-8 1.337-8 4v2a1 1 0 001 1h14a1 1 0 001-1v-2c0-2.663-5.33-4-8-4z" />
             </svg>
           </div>
-          <h2 className="text-3xl font-extrabold text-gray-800 mb-1 tracking-tight">Admin Panel</h2>
-          <p className="text-gray-500 text-base">Sign in to manage your shoe store</p>
+          <h2 className="text-3xl font-extrabold text-gray-800 mb-1 tracking-tight">Super Admin Panel</h2>
+          <p className="text-gray-500 text-base">Sign in to manage your admin</p>
         </div>
 
         {message && (
@@ -102,4 +102,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default Superlogin;
