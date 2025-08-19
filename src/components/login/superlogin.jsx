@@ -30,7 +30,7 @@ const Superlogin = () => {
         localStorage.setItem("token", data.token);
         localStorage.setItem("isLogged", "true");
         setMessage("Login successful!");
-        setTimeout(() => navigate("/superpanel"), 1000);
+        setTimeout(() => navigate("/Superpanel"), 1000);
       } else {
         setMessage(data.message || "Login failed");
       }
