@@ -1,20 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useParams, useNavigate } from 'react-router-dom';
+// components/student/StudentEdit.jsx
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
-const API_BASE_URL = 'https://albn-backend.vercel.app/api';
+const API_BASE_URL = "https://albn-backend.vercel.app/api";
 
-const StudentEdit = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-
+const StudentEdit = ({ studentId, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    campus: '',
-    program: '',
-    group: '',
+    name: "",
+    email: "",
+    password: "",
+    campus: "",
+    program: "",
+    group: "",
   });
 
   const [campuses, setCampuses] = useState([]);
@@ -23,186 +20,151 @@ const StudentEdit = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const token = localStorage.getItem('token');
-
-  // Fetch student data
-  const fetchStudent = async () => {
-    try {
-      const res = await axios.get(`${API_BASE_URL}/student/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setFormData({
-        name: res.data.name,
-        email: res.data.email,
-        password: '', // Leave blank unless updating
-        campus: res.data.campus?._id || res.data.campus || '',
-        program: res.data.program?._id || res.data.program || '',
-        group: res.data.group?._id || res.data.group || '',
-      });
-    } catch (err) {
-      setError('Failed to load student data');
-    }
-  };
-
-  // Fetch campuses
-  const fetchCampuses = async () => {
-    try {
-      const res = await axios.get(`${API_BASE_URL}/campus/active`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setCampuses(res.data);
-    } catch (err) {
-      setError('Failed to load campuses');
-    }
-  };
-
-  // Fetch programs
-  const fetchPrograms = async () => {
-    try {
-      const res = await axios.get(`${API_BASE_URL}/program/active`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setPrograms(res.data);
-    } catch (err) {
-      setError('Failed to load programs');
-    }
-  };
-
-  // Fetch groups
-  const fetchGroups = async () => {
-    try {
-      const res = await axios.get(`${API_BASE_URL}/group/active`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setGroups(res.data);
-    } catch (err) {
-      setError('Failed to load groups');
-    }
-  };
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    const loadData = async () => {
-      await Promise.all([
-        fetchStudent(),
-        fetchCampuses(),
-        fetchPrograms(),
-        fetchGroups()
-      ]);
+    if (!studentId) {
       setLoading(false);
-    };
-    loadData();
-  }, [id]);
+      return;
+    }
 
-  const handleChange = e => {
+    const loadData = async () => {
+      try {
+        const [studentRes, campusesRes, programsRes, groupsRes] = await Promise.all([
+          axios.get(`${API_BASE_URL}/student/${studentId}`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${API_BASE_URL}/campus/active`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${API_BASE_URL}/program/active`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${API_BASE_URL}/group/active`, { headers: { Authorization: `Bearer ${token}` } }),
+        ]);
+
+        setFormData({
+          name: studentRes.data.name || "",
+          email: studentRes.data.email || "",
+          password: "",
+          campus: studentRes.data.campus?._id || "",
+          program: studentRes.data.program?._id || "",
+          group: studentRes.data.group?._id || "",
+        });
+
+        setCampuses(campusesRes.data);
+        setPrograms(programsRes.data);
+        setGroups(groupsRes.data);
+      } catch {
+        setError("Failed to load student or dropdown data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [studentId, token]);
+
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const updateData = { ...formData };
-      if (!updateData.password) {
-        delete updateData.password; // Prevent overwriting password with blank
-      }
+      if (!updateData.password) delete updateData.password;
 
-      await axios.put(`${API_BASE_URL}/student/${id}`, updateData, {
+      await axios.put(`${API_BASE_URL}/student/${studentId}`, updateData, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      navigate('/student');
+
+      if (onSuccess) onSuccess();
+      if (onClose) onClose();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update student');
+      setError(err.response?.data?.message || "Failed to update student");
     }
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <p className="text-center py-10 text-gray-500">Loading...</p>;
 
   return (
-    <div className="p-6 max-w-xl mx-auto bg-white shadow rounded">
-      <h2 className="text-xl font-semibold mb-4">Edit Student</h2>
-      {error && <p className="text-red-500">{error}</p>}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          name="name"
+    <div className="p-8 max-w-xl mx-auto bg-white rounded-3xl shadow-2xl border border-gray-200">
+      {error && <p className="text-red-600 text-center mb-4 font-medium">{error}</p>}
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <input 
+          type="text" 
+          name="name" 
           value={formData.name}
-          placeholder="Name"
-          onChange={handleChange}
-          required
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          placeholder="Email"
-          onChange={handleChange}
-          required
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="password"
-          name="password"
-          value={formData.password}
-          placeholder="New Password (leave blank to keep current)"
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
+          onChange={handleChange} 
+          placeholder="Full Name" 
+          required 
+          className="w-full p-4 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 shadow-sm transition"
         />
 
-        {/* Campus Dropdown */}
-        <select
-          name="campus"
-          value={formData.campus}
-          onChange={handleChange}
-          required
-          className="w-full p-2 border rounded"
+        <input 
+          type="email" 
+          name="email" 
+          value={formData.email}
+          onChange={handleChange} 
+          placeholder="Email Address" 
+          required 
+          className="w-full p-4 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 shadow-sm transition"
+        />
+
+        <input 
+          type="password" 
+          name="password" 
+          value={formData.password}
+          onChange={handleChange} 
+          placeholder="New Password (leave blank to keep current)" 
+          className="w-full p-4 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 shadow-sm transition"
+        />
+
+        <select 
+          name="campus" 
+          value={formData.campus} 
+          onChange={handleChange} 
+          required 
+          className="w-full p-4 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 shadow-sm transition"
         >
           <option value="">Select Campus</option>
-          {campuses.map(campus => (
-            <option key={campus._id} value={campus._id}>
-              {campus.name}
-            </option>
-          ))}
+          {campuses.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
         </select>
 
-        {/* Program Dropdown */}
-        <select
-          name="program"
-          value={formData.program}
-          onChange={handleChange}
-          required
-          className="w-full p-2 border rounded"
+        <select 
+          name="program" 
+          value={formData.program} 
+          onChange={handleChange} 
+          required 
+          className="w-full p-4 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 shadow-sm transition"
         >
           <option value="">Select Program</option>
-          {programs.map(program => (
-            <option key={program._id} value={program._id}>
-              {program.title}
-            </option>
-          ))}
+          {programs.map(p => <option key={p._id} value={p._id}>{p.title}</option>)}
         </select>
 
-        {/* Group Dropdown */}
-        <select
-          name="group"
-          value={formData.group}
-          onChange={handleChange}
-          required
-          className="w-full p-2 border rounded"
+        <select 
+          name="group" 
+          value={formData.group} 
+          onChange={handleChange} 
+          required 
+          className="w-full p-4 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 shadow-sm transition"
         >
           <option value="">Select Group</option>
-          {groups.map(group => (
-            <option key={group._id} value={group._id}>
-              {group.name}
-            </option>
-          ))}
+          {groups.map(g => <option key={g._id} value={g._id}>{g.name}</option>)}
         </select>
 
-        <button
-          type="submit"
-          className="bg-green-600 text-white px-4 py-2 rounded"
-        >
-          Update
-        </button>
+        <div className="flex justify-end space-x-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-6 py-3 rounded-xl bg-gray-300 hover:bg-gray-400"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-pink-600 text-white hover:from-pink-500 hover:to-blue-500 shadow-lg transition-transform transform hover:scale-105"
+          >
+            Update Student
+          </button>
+        </div>
       </form>
     </div>
   );

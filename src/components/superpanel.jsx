@@ -4,155 +4,143 @@ import {
   UserPlus,
   Building2,
   BookOpen,
-  Group,
+  Users,
+  Bell,
+  LogOut,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
-import AdminManagement from "./admin/AdminManagement";
-import CampusManagement from "./campus/CampusManagement";
-import ProgramManagement from "./program/ProgramManagement";
-import StudentManagement from "./student/StudentManagement";
-import GroupManagement from "./group/GroupManagement";
+import AdminManagement from "./admin/AdminManagement.jsx";
+import CampusManagement from "./campus/CampusManagement.jsx";
+import ProgramManagement from "./program/ProgramManagement.jsx";
+import StudentManagement from "./student/StudentManagement.jsx";
+import GroupManagement from "./group/GroupManagement.jsx";
 
 const Superpanel = () => {
   const [activeModule, setActiveModule] = useState("dashboard");
 
-  // Single array for modules
   const modules = [
-    {
-      key: "admin",
-      title: "Admins",
-      icon: <UserPlus className="w-5 h-5 mr-2" />,
-      component: <AdminManagement />,
-      card: {
-        description: "Manage All Admins in the system.",
-        icon: <UserPlus className="w-10 h-10 text-blue-600" />,
-        bgColor: "bg-blue-100",
-        buttonColor: "bg-blue-600 hover:bg-blue-700",
-      },
-    },
-    {
-      key: "campus",
-      title: "Campuses",
-      icon: <Building2 className="w-5 h-5 mr-2" />,
-      component: <CampusManagement />,
-      card: {
-        description: "Manage all campuses in your institution.",
-        icon: <Building2 className="w-10 h-10 text-green-600" />,
-        bgColor: "bg-green-100",
-        buttonColor: "bg-green-600 hover:bg-green-700",
-      },
-    },
-    {
-      key: "program",
-      title: "Programs",
-      icon: <BookOpen className="w-5 h-5 mr-2" />,
-      component: <ProgramManagement />,
-      card: {
-        description: "Manage all programs in your institution.",
-        icon: <BookOpen className="w-10 h-10 text-purple-600" />,
-        bgColor: "bg-purple-100",
-        buttonColor: "bg-purple-600 hover:bg-purple-700",
-      },
-    },
-    {
-      key: "student",
-      title: "Students",
-      icon: <UserPlus className="w-5 h-5 mr-2" />,
-      component: <StudentManagement />,
-      card: {
-        description: "Manage all students in your institution.",
-        icon: <UserPlus className="w-10 h-10 text-red-600" />,
-        bgColor: "bg-red-100",
-        buttonColor: "bg-red-600 hover:bg-red-700",
-      },
-    },
-    {
-      key: "group",
-      title: "Class",
-      icon: <Group className="w-5 h-5 mr-2" />,
-      component: <GroupManagement />,
-      card: {
-        description: "Manage all Groups/Classes in your institution.",
-        icon: <Group className="w-10 h-10 text-cyan-600" />,
-        bgColor: "bg-cyan-100",
-        buttonColor: "bg-cyan-600 hover:bg-cyan-700",
-      },
-    },
+    { key: "admin", title: "Admins", icon: <UserPlus className="w-7 h-7" />, component: <AdminManagement />, gradient: "from-blue-500 to-indigo-600" },
+    { key: "campus", title: "Campuses", icon: <Building2 className="w-7 h-7" />, component: <CampusManagement />, gradient: "from-green-500 to-emerald-600" },
+    { key: "program", title: "Programs", icon: <BookOpen className="w-7 h-7" />, component: <ProgramManagement />, gradient: "from-purple-500 to-pink-600" },
+    { key: "student", title: "Students", icon: <UserPlus className="w-7 h-7" />, component: <StudentManagement />, gradient: "from-red-500 to-orange-600" },
+    { key: "group", title: "Classes", icon: <Users className="w-7 h-7" />, component: <GroupManagement />, gradient: "from-cyan-500 to-blue-600" },
   ];
 
-  const renderDashboard = () => (
-    <>
-      <h2 className="text-3xl font-bold mb-6 text-gray-800">Dashboard</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {modules.map((mod) => (
-          <div
-            key={mod.key}
-            className="bg-white rounded-3xl shadow-xl p-8 flex flex-col items-center hover:scale-105 transition-all duration-300 group"
-          >
-            <div className={`${mod.card.bgColor} p-4 rounded-full mb-5`}>
-              {mod.card.icon}
+const renderDashboard = () => (
+  <div className="flex flex-col items-center w-full px-8 py-12">
+    <h2 className="text-6xl font-extrabold mb-16 text-gray-900 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent text-center">
+      Dashboard
+    </h2>
+
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 w-full max-w-7xl">
+      {modules.map((mod) => (
+        <motion.div
+          key={mod.key}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={() => setActiveModule(mod.key)}
+          className={`relative rounded-3xl p-10 cursor-pointer overflow-hidden shadow-2xl transition-transform duration-300 bg-gradient-to-r ${mod.gradient} flex flex-col justify-between`}
+        >
+          {/* Decorative elements */}
+          <div className="absolute top-0 left-0 w-full h-full bg-white/10 rotate-12 pointer-events-none rounded-3xl"></div>
+          <div className="absolute -top-6 -right-6 w-16 h-16 bg-white/30 rounded-full animate-pulse blur-2xl pointer-events-none"></div>
+          <div className="absolute -bottom-6 -left-6 w-20 h-20 bg-white/20 rounded-full animate-ping blur-3xl pointer-events-none"></div>
+
+          {/* Icon and title */}
+          <div className="flex items-center gap-4 mb-4 relative z-10">
+            <div className="bg-white/30 backdrop-blur-md p-4 rounded-xl shadow-lg flex items-center justify-center text-white">
+              {mod.icon}
             </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">
-              Manage {mod.title}
-            </h2>
-            <p className="text-center text-gray-600 mb-6">
-              {mod.card.description}
-            </p>
-            <button
-              onClick={() => setActiveModule(mod.key)}
-              className={`${mod.card.buttonColor} text-white px-6 py-2 rounded-lg w-full font-semibold transition`}
-            >
-              Go to {mod.title}
-            </button>
+            <h3 className="text-3xl font-bold text-white">{mod.title}</h3>
           </div>
-        ))}
-      </div>
-    </>
-  );
+
+          {/* Description */}
+          <p className="relative z-10 text-white text-opacity-95 text-lg leading-relaxed">
+            Manage all <span className="font-semibold">{mod.title.toLowerCase()}</span> in your institution efficiently and effortlessly.
+          </p>
+
+          {/* Small pulse dot */}
+          <div className="absolute top-6 right-6 w-3 h-3 bg-white rounded-full animate-pulse opacity-80"></div>
+        </motion.div>
+      ))}
+    </div>
+  </div>
+);
+
 
   const renderModule = () => {
-    if (activeModule === "dashboard") return renderDashboard();
-    const mod = modules.find((m) => m.key === activeModule);
-    return mod?.component || null;
-  };
+  if (activeModule === "dashboard") return renderDashboard();
+  const mod = modules.find((m) => m.key === activeModule);
+  return <div className="flex-1">{mod?.component}</div>;
+};
+
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r shadow-md p-5 space-y-6">
-        <h1 className="text-2xl font-bold text-blue-700">Super Panel</h1>
-        <nav className="space-y-2">
+      <aside className="w-72 bg-white backdrop-blur-sm border-r border-gray-200 shadow-xl flex flex-col p-8 sticky top-0 h-screen">
+        <div className="flex items-center gap-3 mb-14">
+          <LayoutDashboard className="w-8 h-8 text-indigo-600" />
+          <span className="font-bold text-2xl text-indigo-700">Alburhan</span>
+        </div>
+
+        <nav className="space-y-4 flex-1 text-lg">
           <button
             onClick={() => setActiveModule("dashboard")}
-            className={`flex items-center w-full px-4 py-2 text-left rounded-lg ${
+            className={`relative flex items-center gap-4 w-full px-4 py-3 rounded-xl transition-all text-lg ${
               activeModule === "dashboard"
-                ? "bg-blue-100 text-blue-700 font-semibold"
+                ? "bg-indigo-100 text-indigo-700 font-semibold"
                 : "hover:bg-gray-100"
             }`}
           >
-            <LayoutDashboard className="w-5 h-5 mr-2" />
-            Dashboard
+            {activeModule === "dashboard" && (
+              <span className="absolute left-0 top-0 h-full w-2 bg-indigo-500 rounded-r-lg"></span>
+            )}
+            <LayoutDashboard className="w-6 h-6 shrink-0" />
+            <span>Dashboard</span>
           </button>
 
           {modules.map((mod) => (
             <button
               key={mod.key}
               onClick={() => setActiveModule(mod.key)}
-              className={`flex items-center w-full px-4 py-2 text-left rounded-lg ${
+              className={`relative flex items-center gap-4 w-full px-4 py-3 rounded-xl transition-all text-lg ${
                 activeModule === mod.key
-                  ? "bg-blue-100 text-blue-700 font-semibold"
+                  ? "bg-indigo-100 text-indigo-700 font-semibold"
                   : "hover:bg-gray-100"
               }`}
             >
-              {mod.icon}
-              {mod.title}
+              {activeModule === mod.key && (
+                <span className="absolute left-0 top-0 h-full w-2 bg-indigo-500 rounded-r-lg"></span>
+              )}
+              <span className="shrink-0">{mod.icon}</span>
+              <span>{mod.title}</span>
             </button>
           ))}
         </nav>
+
+        <div className="mt-auto">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              localStorage.removeItem("token");
+              localStorage.removeItem("isLogged");
+              window.location.reload();
+            }}
+            className="flex items-center gap-4 w-full px-6 py-3 rounded-xl text-xl text-white font-semibold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 shadow-lg transition"
+          >
+            <LogOut className="w-6 h-6" />
+            Logout
+          </motion.button>
+        </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 bg-gray-50 p-10">{renderModule()}</main>
+      <main className="flex-1 flex flex-col overflow-y-auto">
+        {renderModule()}
+      </main>
     </div>
   );
 };

@@ -1,78 +1,102 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useParams, useNavigate } from 'react-router-dom';
+// components/group/GroupEdit.jsx
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
-const API_BASE_URL = 'https://albn-backend.vercel.app/api/group';
+const API_BASE_URL = "https://albn-backend.vercel.app/api";
 
-const GroupEdit = () => {
-  const { id } = useParams();
+const GroupEdit = ({ groupId, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    murabbi: '',
+    name: "",
+    murabbi: "",
   });
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
-  const token = localStorage.getItem('token');
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    axios
-      .get(`${API_BASE_URL}/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      .then(res => {
-        setFormData(res.data); // Directly set the fetched data
-      })
-      .catch(err => {
-        console.error(err);
-        setError('Failed to load group');
-      });
-  }, [id, token]);
+    if (!groupId) {
+      setError("No group ID provided");
+      setLoading(false);
+      return;
+    }
 
-  const handleChange = e => {
+    const loadGroup = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/group/${groupId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setFormData({
+          name: res.data.name || "",
+          murabbi: res.data.murabbi || "",
+        });
+      } catch {
+        setError("Failed to load group data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadGroup();
+  }, [groupId, token]);
+
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!groupId) return; // safety check
+
     try {
-      await axios.put(`${API_BASE_URL}/${id}`, formData, {
-        headers: { Authorization: `Bearer ${token}` }
+      await axios.put(`${API_BASE_URL}/group/${groupId}`, formData, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-      navigate('/group');
+      if (onSuccess) onSuccess(); // refresh parent data
+      if (onClose) onClose();     // close modal
     } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.message || 'Failed to update group');
+      setError(err.response?.data?.message || "Failed to update group");
     }
   };
 
+  if (loading)
+    return <p className="text-center py-10 text-gray-500">Loading...</p>;
+
   return (
-    <div className="p-6 max-w-xl mx-auto bg-white shadow rounded">
-      <h2 className="text-xl font-semibold mb-4">Edit Group</h2>
-      {error && <p className="text-red-500">{error}</p>}
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="p-8 max-w-xl mx-auto bg-white rounded-3xl shadow-2xl border border-gray-200">
+      {error && (
+        <p className="text-red-600 text-center mb-4 font-medium">{error}</p>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-5">
         <input
           type="text"
           name="name"
           value={formData.name}
           onChange={handleChange}
+          placeholder="Group Name"
           required
-          className="w-full p-2 border rounded"
+          className="w-full p-4 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 shadow-sm transition"
         />
+
         <input
           type="text"
           name="murabbi"
           value={formData.murabbi}
           onChange={handleChange}
+          placeholder="Murabbi"
           required
-          className="w-full p-2 border rounded"
+          className="w-full p-4 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 shadow-sm transition"
         />
+
         <button
           type="submit"
-          className="bg-green-500 text-white px-4 py-2 rounded"
+          className="w-full py-4 text-xl font-semibold text-white rounded-xl bg-gradient-to-r from-blue-500 to-pink-600 hover:from-pink-500 hover:to-blue-500 shadow-lg transition-transform transform hover:scale-105"
         >
-          Update
+          Update Group
         </button>
       </form>
     </div>

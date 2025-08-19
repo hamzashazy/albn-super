@@ -6,12 +6,7 @@ const API_BASE_URL = 'https://albn-backend.vercel.app/api';
 
 const StudentCreate = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    campus: '',
-    program: '',
-    group: '',
+    name: '', email: '', password: '', campus: '', program: '', group: ''
   });
 
   const [campuses, setCampuses] = useState([]);
@@ -20,49 +15,22 @@ const StudentCreate = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Fetch campuses
-  const fetchCampuses = async () => {
+  const fetchData = async (endpoint, setter) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get(`${API_BASE_URL}/campus/active`, {
+      const res = await axios.get(`${API_BASE_URL}/${endpoint}/active`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setCampuses(res.data);
+      setter(res.data);
     } catch {
-      setError('Failed to load campuses');
-    }
-  };
-
-  // Fetch programs
-  const fetchPrograms = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get(`${API_BASE_URL}/program/active`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setPrograms(res.data);
-    } catch {
-      setError('Failed to load programs');
-    }
-  };
-
-  // Fetch groups
-  const fetchGroups = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get(`${API_BASE_URL}/group/active`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setGroups(res.data);
-    } catch {
-      setError('Failed to load groups');
+      setError(`Failed to load ${endpoint}`);
     }
   };
 
   useEffect(() => {
-    fetchCampuses();
-    fetchPrograms();
-    fetchGroups();
+    fetchData('campus', setCampuses);
+    fetchData('program', setPrograms);
+    fetchData('group', setGroups);
   }, []);
 
   const handleChange = e => {
@@ -84,41 +52,33 @@ const StudentCreate = () => {
   };
 
   return (
-    <div className="p-6 max-w-xl mx-auto bg-white shadow rounded">
-      <h2 className="text-xl font-semibold mb-4">Create New Student</h2>
-      {error && <p className="text-red-500">{error}</p>}
-      
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input type="text" name="name" placeholder="Name" onChange={handleChange} required className="w-full p-2 border rounded" />
-        <input type="email" name="email" placeholder="Email" onChange={handleChange} required className="w-full p-2 border rounded" />
-        <input type="password" name="password" placeholder="Password" onChange={handleChange} required className="w-full p-2 border rounded" />
-
+    <div className="p-8 max-w-xl mx-auto bg-white rounded-3xl shadow-2xl border border-gray-200">
+      {error && <p className="text-red-600 text-center mb-4 font-medium">{error}</p>}
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <input type="text" name="name" placeholder="Name" onChange={handleChange} required className="w-full p-4 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm transition" />
+        <input type="email" name="email" placeholder="Email" onChange={handleChange} required className="w-full p-4 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm transition" />
+        <input type="password" name="password" placeholder="Password" onChange={handleChange} required className="w-full p-4 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm transition" />
+        
         {/* Campus Dropdown */}
-        <select name="campus" value={formData.campus} onChange={handleChange} required className="w-full p-2 border rounded">
+        <select name="campus" value={formData.campus} onChange={handleChange} required className="w-full p-4 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm transition">
           <option value="">Select Campus</option>
-          {campuses.map(campus => (
-            <option key={campus._id} value={campus._id}>{campus.name}</option>
-          ))}
+          {campuses.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
         </select>
 
         {/* Program Dropdown */}
-        <select name="program" value={formData.program} onChange={handleChange} required className="w-full p-2 border rounded">
+        <select name="program" value={formData.program} onChange={handleChange} required className="w-full p-4 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm transition">
           <option value="">Select Program</option>
-          {programs.map(program => (
-            <option key={program._id} value={program._id}>{program.title}</option>
-          ))}
+          {programs.map(p => <option key={p._id} value={p._id}>{p.title}</option>)}
         </select>
 
         {/* Group Dropdown */}
-        <select name="group" value={formData.group} onChange={handleChange} required className="w-full p-2 border rounded">
-          <option value="">Select Class/Group</option>
-          {groups.map(group => (
-            <option key={group._id} value={group._id}>{group.name}</option>
-          ))}
+        <select name="group" value={formData.group} onChange={handleChange} required className="w-full p-4 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm transition">
+          <option value="">Select Group</option>
+          {groups.map(g => <option key={g._id} value={g._id}>{g.name}</option>)}
         </select>
 
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
-          Create
+        <button type="submit" className="w-full py-4 text-xl font-semibold text-white rounded-xl bg-gradient-to-r from-blue-500 to-pink-600 hover:from-indigo-600 hover:to-blue-500 shadow-lg transition-transform transform hover:scale-105">
+          Create Student
         </button>
       </form>
     </div>

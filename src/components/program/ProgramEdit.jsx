@@ -1,59 +1,122 @@
 // components/program/ProgramEdit.jsx
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
-const API_BASE_URL = 'https://albn-backend.vercel.app/api/program';
+const API_BASE_URL = "https://albn-backend.vercel.app/api";
 
-const ProgramEdit = () => {
-  const { id } = useParams();
-  const [formData, setFormData] = useState({ title: '', details: '', startDate: '' });
+const ProgramEdit = ({ programId, onClose, onSuccess }) => {
+  const [formData, setFormData] = useState({
+    title: "",
+    details: "",
+    startDate: "",
+  });
+
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
-  const token = localStorage.getItem('token'); // Token from login
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    axios.get(`${API_BASE_URL}/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then(res => {
-        const { title, details, startDate } = res.data;
-        setFormData({ title, details, startDate: startDate.split('T')[0] });
-      })
-      .catch(() => setError('Failed to load program'));
-  }, [id, token]);
+    if (!programId) {
+      setLoading(false);
+      return;
+    }
 
-  const handleChange = e => {
+    const loadProgram = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/program/${programId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setFormData({
+          title: res.data.title || "",
+          details: res.data.details || "",
+          startDate: res.data.startDate ? res.data.startDate.split("T")[0] : "",
+        });
+      } catch {
+        setError("Failed to load program data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProgram();
+  }, [programId, token]);
+
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`${API_BASE_URL}/${id}`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      await axios.put(`${API_BASE_URL}/program/${programId}`, formData, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-      navigate('/program');
+
+      if (onSuccess) onSuccess(); // close modal & refresh parent data
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update program');
+      setError(err.response?.data?.message || "Failed to update program");
     }
   };
 
+  if (loading)
+    return (
+      <p className="text-center py-10 text-gray-500">Loading...</p>
+    );
+
   return (
-    <div className="p-6 max-w-xl mx-auto bg-white shadow rounded">
-      <h2 className="text-xl font-semibold mb-4">Edit Program</h2>
-      {error && <p className="text-red-500">{error}</p>}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input type="text" name="title" value={formData.title} onChange={handleChange} required className="w-full p-2 border rounded" />
-        <textarea name="details" value={formData.details} onChange={handleChange} required className="w-full p-2 border rounded" />
-        <input type="date" name="startDate" value={formData.startDate} onChange={handleChange} required className="w-full p-2 border rounded" />
-        <button type="submit" className="bg-yellow-500 text-white px-4 py-2 rounded">Update</button>
+    <div className="p-8 max-w-xl mx-auto bg-white rounded-3xl shadow-2xl border border-gray-200">
+      {error && (
+        <p className="text-red-600 text-center mb-4 font-medium">{error}</p>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <input
+          type="text"
+          name="title"
+          value={formData.title}
+          onChange={handleChange}
+          placeholder="Program Title"
+          required
+          className="w-full p-4 text-lg rounded-xl border border-gray-300 
+          focus:outline-none focus:ring-2 focus:ring-indigo-400 
+          focus:border-indigo-600 shadow-sm transition"
+        />
+
+        <textarea
+          name="details"
+          value={formData.details}
+          onChange={handleChange}
+          placeholder="Program Details"
+          required
+          rows={4}
+          className="w-full p-4 text-lg rounded-xl border border-gray-300 
+          focus:outline-none focus:ring-2 focus:ring-indigo-400 
+          focus:border-indigo-600 shadow-sm transition"
+        />
+
+        <input
+          type="date"
+          name="startDate"
+          value={formData.startDate}
+          onChange={handleChange}
+          required
+          className="w-full p-4 text-lg rounded-xl border border-gray-300 
+          focus:outline-none focus:ring-2 focus:ring-indigo-400 
+          focus:border-indigo-600 shadow-sm transition"
+        />
+
+        <button
+          type="submit"
+          className="w-full py-4 text-xl font-semibold text-white 
+          rounded-xl bg-gradient-to-r from-blue-500 to-pink-600 
+          hover:from-pink-500 hover:to-blue-500 shadow-lg 
+          transition-transform transform hover:scale-105"
+        >
+          Update Program
+        </button>
       </form>
     </div>
   );
