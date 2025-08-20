@@ -16,6 +16,7 @@ import CampusManagement from "./campus/CampusManagement.jsx";
 import ProgramManagement from "./program/ProgramManagement.jsx";
 import StudentManagement from "./student/StudentManagement.jsx";
 import GroupManagement from "./group/GroupManagement.jsx";
+import NotificationManagement from "./notification/NotificationManagement.jsx";
 
 const Superpanel = () => {
   const [activeModule, setActiveModule] = useState("dashboard");
@@ -55,6 +56,13 @@ const Superpanel = () => {
       title: "Classes",
       icon: <Users className="w-7 h-7" />,
       component: <GroupManagement />,
+      gradient: "from-cyan-500 to-blue-600",
+    },
+    {
+      key: "notification",
+      title: "Notifications",
+      icon: <Users className="w-7 h-7" />,
+      component: <NotificationManagement />,
       gradient: "from-cyan-500 to-blue-600",
     },
   ];
