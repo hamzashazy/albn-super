@@ -34,7 +34,7 @@ const AdminEdit = ({ adminId, onClose, onSuccess }) => {
         setFormData({
           name: adminRes.data.name,
           email: adminRes.data.email,
-          password: "",
+          password: adminRes.data.password,
           campus: adminRes.data.campus?._id || "",
           cnic: adminRes.data.cnic || "",
         });
