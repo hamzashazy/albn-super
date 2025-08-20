@@ -12,6 +12,7 @@ import {
   MoreVertical,
   AlertCircle,
   X,
+  Building,
 } from "lucide-react";
 import GroupCreate from "./GroupCreate";
 import GroupEdit from "./GroupEdit";
@@ -235,6 +236,12 @@ const GroupManagement = () => {
           </p>
         </div>
       )}
+        {group.campus?.name && (
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <Building className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> 
+            <span className="truncate">{group.campus.name}</span>
+          </div>
+        )}
     </div>
   );
 
