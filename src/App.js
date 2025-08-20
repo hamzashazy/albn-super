@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
 import Superlogin from "./components/login/superlogin.jsx";
-import Superpanel from "./components/Superpanel.jsx";
+import Superpanel from "./components/superpanel.jsx";
 import { FaHome } from "react-icons/fa";
 import AdminManagement from "./components/admin/AdminManagement.jsx";
 import AdminCreate from "./components/admin/AdminCreate.jsx";
