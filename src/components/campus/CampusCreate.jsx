@@ -26,7 +26,7 @@ const CampusCreate = () => {
       await axios.post(`${API_BASE_URL}/campus`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      navigate("/campus");
+      navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to create campus");
     }
