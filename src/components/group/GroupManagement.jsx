@@ -276,7 +276,7 @@ const GroupManagement = () => {
             icon={CheckCircle}
             label="Active Groups"
             value={stats.active}
-            color="text-blue-600"
+            color="text-green-600"
           />
           <div className="sm:col-span-2 lg:col-span-1">
             <StatsCard

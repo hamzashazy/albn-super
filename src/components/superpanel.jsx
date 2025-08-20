@@ -8,6 +8,7 @@ import {
   LogOut,
   Menu,
   X,
+  Bell,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -61,7 +62,7 @@ const Superpanel = () => {
     {
       key: "notification",
       title: "Notifications",
-      icon: <Users className="w-7 h-7" />,
+      icon: <Bell className="w-7 h-7" />,
       component: <NotificationManagement />,
       gradient: "from-cyan-500 to-blue-600",
     },
@@ -118,7 +119,7 @@ const Superpanel = () => {
     <div className="flex flex-col h-full">
       <div className="flex items-center gap-3 mb-10">
         <LayoutDashboard className="w-8 h-8 text-indigo-600" />
-        <span className="font-bold text-2xl text-indigo-700">Alburhan</span>
+        <span className="font-bold text-2xl text-indigo-700">Super Panel</span>
       </div>
 
       <nav className="space-y-3 flex-1 text-lg">
