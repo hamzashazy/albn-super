@@ -394,10 +394,7 @@ const GroupManagement = () => {
               </button>
             </div>
             <GroupCreate
-              onClose={() => {
-                setIsCreateOpen(false);
-                fetchGroups();
-              }}
+              onSuccess={() => { setIsCreateOpen(false); fetchGroups(); }} 
             />
           </div>
         </div>
@@ -424,10 +421,6 @@ const GroupManagement = () => {
             </div>
             <GroupEdit
               groupId={selectedGroup._id}
-              onClose={() => {
-                setIsEditOpen(false);
-                fetchGroups();
-              }}
               onSuccess={() => {
                 setIsEditOpen(false);
                 fetchGroups();

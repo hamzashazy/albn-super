@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 
 const API_BASE_URL = 'https://albn-backend.vercel.app/api';
 
-const StudentCreate = () => {
+const StudentCreate = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
     name: '', email: '', password: '', campus: '', program: '', group: ''
   });
@@ -13,7 +12,6 @@ const StudentCreate = () => {
   const [programs, setPrograms] = useState([]);
   const [groups, setGroups] = useState([]);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
   const fetchData = async (endpoint, setter) => {
     try {
@@ -45,9 +43,15 @@ const StudentCreate = () => {
       await axios.post(`${API_BASE_URL}/student/register`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      navigate('/student');
+
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create student');
+    }
+    finally {
+      setLoading(false);
     }
   };
 

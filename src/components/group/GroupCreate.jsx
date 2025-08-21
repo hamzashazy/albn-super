@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Input } from '@headlessui/react';
 
 const API_BASE_URL = 'https://albn-backend.vercel.app/api';
 
@@ -34,32 +35,27 @@ const GroupCreate = ({ onSuccess }) => {
     if (error) setError(null);
   };
 
-const handleSubmit = async e => {
-  e.preventDefault();
-  setLoading(true);
-  setError(null);
-
-  // ✅ Validation step (new)
-  if (!formData.campus) {
-    setError("Campus is required");
-    setLoading(false);
-    return;
-  }
-
-  try {
-    const token = localStorage.getItem("token");
-    await axios.post(`${API_BASE_URL}/group/`, formData, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (onSuccess) onSuccess();
-  } catch (err) {
-    setError(err.response?.data?.message || "Failed to create group");
-  } finally {
-    setLoading(false);
-  }
-};
-
+  const handleSubmit = async e => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(`${API_BASE_URL}/group/`, formData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      // Call the success callback to close modal and refresh data
+      if (onSuccess) {
+        onSuccess();
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to create group');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="w-full">
@@ -84,9 +80,10 @@ const handleSubmit = async e => {
         </div>
         
         <div>
-          <textarea 
+          <input
+            type="text" 
             name="murabbi" 
-            placeholder="Details" 
+            placeholder="Murabbi" 
             value={formData.murabbi}
             onChange={handleChange} 
             required 
@@ -94,7 +91,7 @@ const handleSubmit = async e => {
             className="w-full p-3 sm:p-4 text-base sm:text-lg rounded-lg sm:rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed"
           />
         </div>
-       
+        
         <div>
           <select 
             name="campus" 

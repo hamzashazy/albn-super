@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 
 const API_BASE_URL = 'https://albn-backend.vercel.app/api/notification';
 
-const NotificationCreate = () => {
+const NotificationCreate = ({onSuccess}) => {
   const [formData, setFormData] = useState({ title: '', message: '' });
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -21,10 +19,12 @@ const NotificationCreate = () => {
       await axios.post(`${API_BASE_URL}/`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      navigate('/dashboard');
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create notification');
-    }
+    } 
   };
 
   return (

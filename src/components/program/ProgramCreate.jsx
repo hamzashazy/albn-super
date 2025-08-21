@@ -42,7 +42,7 @@ const ProgramCreate = ({ onSuccess }) => {
     
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`${API_BASE_URL}/program/register`, formData, {
+      await axios.post(`${API_BASE_URL}/program/`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       

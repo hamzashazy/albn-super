@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 const API_BASE_URL = "https://albn-backend.vercel.app/api";
 
-const CampusCreate = () => {
+const CampusCreate = ({onSuccess}) => {
   const [formData, setFormData] = useState({
     name: "",
     city: "",
@@ -12,7 +11,6 @@ const CampusCreate = () => {
     founding_date: "",
   });
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,10 +24,12 @@ const CampusCreate = () => {
       await axios.post(`${API_BASE_URL}/campus`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      navigate("/dashboard");
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to create campus");
-    }
+    } 
   };
 
   return (

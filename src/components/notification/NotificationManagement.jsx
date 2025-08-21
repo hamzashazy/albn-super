@@ -387,7 +387,7 @@ const NotificationManagement = () => {
               </button>
             </div>
             <NotificationCreate
-              onClose={() => {
+              onSuccess={() => {
                 setIsCreateOpen(false);
                 fetchNotifications();
               }}
