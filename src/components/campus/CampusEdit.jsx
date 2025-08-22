@@ -37,7 +37,6 @@ const CampusEdit = ({ campusId, onClose, onSuccess }) => {
           founding_date: res.data.founding_date
             ? res.data.founding_date.split("T")[0]
             : "",
-          status: res.data.isDeleted ? "disabled" : "active",
         });
       } catch (err) {
         setError("Failed to load campus data");
@@ -62,7 +61,6 @@ const CampusEdit = ({ campusId, onClose, onSuccess }) => {
         city: formData.city.trim(),
         zimedaar: formData.zimedaar.trim(),
         founding_date: formData.founding_date,
-        isDeleted: formData.status === "disabled",
       };
 
       await axios.put(`${API_BASE_URL}/campus/${campusId}`, payload, {
@@ -124,16 +122,6 @@ const CampusEdit = ({ campusId, onClose, onSuccess }) => {
           required
           className="w-full p-4 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 shadow-sm transition"
         />
-
-        <select
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-          className="w-full p-4 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 shadow-sm transition"
-        >
-          <option value="active">Active</option>
-          <option value="disabled">Disabled</option>
-        </select>
 
         <button
           type="submit"

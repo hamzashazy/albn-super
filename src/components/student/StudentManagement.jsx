@@ -141,102 +141,103 @@ const StudentManagement = () => {
     </div>
   );
 
-  // Student Card
-  const StudentCard = ({ student }) => (
-    <div
-      className={`bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-200 relative transition transform hover:shadow-2xl hover:-translate-y-1 ${
-        student.isDeleted ? "opacity-70" : ""
-      }`}
-    >
-      <div className="flex justify-between items-start mb-4 sm:mb-5">
-        <div className="flex items-center space-x-3 sm:space-x-4 flex-1 min-w-0">
-          <div
-            className={`w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-full flex items-center justify-center text-white font-bold text-lg sm:text-xl lg:text-2xl shadow-md flex-shrink-0 ${
-              student.isDeleted
-                ? "bg-gradient-to-br from-red-400 to-red-600"
-                : "bg-gradient-to-br from-indigo-500 to-indigo-700"
-            }`}
-          >
-            {student.name?.charAt(0).toUpperCase()}
-          </div>
-          <div className="min-w-0 flex-1">
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
-              {student.name}
-            </h3>
-            <span
-              className={`inline-block px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-full mt-1 ${
+    // Student Card
+    const StudentCard = ({ student }) => (
+      <div
+        className={`bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-200 relative transition transform hover:shadow-2xl hover:-translate-y-1 ${
+          student.isDeleted ? "opacity-70" : ""
+        }`}
+      >
+        <div className="flex justify-between items-start mb-4 sm:mb-5">
+          <div className="flex items-center space-x-3 sm:space-x-4 flex-1 min-w-0">
+            <div
+              className={`w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-full flex items-center justify-center text-white font-bold text-lg sm:text-xl lg:text-2xl shadow-md flex-shrink-0 ${
                 student.isDeleted
-                  ? "bg-red-100 text-red-700"
-                  : "bg-green-100 text-green-700"
+                  ? "bg-gradient-to-br from-red-400 to-red-600"
+                  : "bg-gradient-to-br from-indigo-500 to-indigo-700"
               }`}
             >
-              {student.isDeleted ? "Disabled" : "Active"}
-            </span>
+              {student.name?.charAt(0).toUpperCase()}
+            </div>
+            <div className="min-w-0 flex-1">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
+                {student.name}
+              </h3>
+              <span
+                className={`inline-block px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-full mt-1 ${
+                  student.isDeleted
+                    ? "bg-red-100 text-red-700"
+                    : "bg-green-100 text-green-700"
+                }`}
+              >
+                {student.isDeleted ? "Disabled" : "Active"}
+              </span>
+            </div>
           </div>
+          <button
+            type="button"
+            className="flex-shrink-0 p-1"
+            onClick={(e) => { e.stopPropagation(); 
+            setShowDropdown(showDropdown === student._id ? null : student._id); }}
+          >
+            <MoreVertical className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500" />
+          </button>
+          {showDropdown === student._id && (
+            <div className="absolute right-4 sm:right-6 top-12 sm:top-14 bg-white rounded-lg shadow-xl border py-2 sm:py-3 z-20 w-40 sm:w-48 text-sm sm:text-lg">
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); setSelectedStudent(student); setIsEditOpen(true); setShowDropdown(null); }}
+                className="w-full px-3 sm:px-5 py-2 sm:py-3 text-left hover:bg-gray-100 flex items-center gap-2 sm:gap-3"
+              >
+                <Edit className="w-4 h-4 sm:w-5 sm:h-5" /> Edit
+              </button>
+              {student.isDeleted ? (
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); handleRestoreStudent(student._id); setShowDropdown(null); }}
+                  className="w-full px-3 sm:px-5 py-2 sm:py-3 text-left hover:bg-gray-100 text-blue-600 flex items-center gap-2 sm:gap-3"
+                >
+                  <RefreshCcw className="w-4 h-4 sm:w-5 sm:h-5" /> Restore
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); if (window.confirm("Disable this student?")) { handleDeleteStudent(student._id); setShowDropdown(null); } }}
+                  className="w-full px-3 sm:px-5 py-2 sm:py-3 text-left hover:bg-gray-100 text-red-600 flex items-center gap-2 sm:gap-3"
+                >
+                  <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" /> Disable
+                </button>
+              )}
+            </div>
+          )}
         </div>
-        <button
-          type="button"
-          className="flex-shrink-0 p-1"
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowDropdown(showDropdown === student._id ? null : student._id); }}
-        >
-          <MoreVertical className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500" />
-        </button>
-        {showDropdown === student._id && (
-          <div className="absolute right-4 sm:right-6 top-12 sm:top-14 bg-white rounded-lg shadow-xl border py-2 sm:py-3 z-20 w-40 sm:w-48 text-sm sm:text-lg">
-            <button
-              type="button"
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setSelectedStudent(student); setIsEditOpen(true); setShowDropdown(null); }}
-              className="w-full px-3 sm:px-5 py-2 sm:py-3 text-left hover:bg-gray-100 flex items-center gap-2 sm:gap-3"
-            >
-              <Edit className="w-4 h-4 sm:w-5 sm:h-5" /> Edit
-            </button>
-            {student.isDeleted ? (
-              <button
-                type="button"
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleRestoreStudent(student._id); setShowDropdown(null); }}
-                className="w-full px-3 sm:px-5 py-2 sm:py-3 text-left hover:bg-gray-100 text-blue-600 flex items-center gap-2 sm:gap-3"
-              >
-                <RefreshCcw className="w-4 h-4 sm:w-5 sm:h-5" /> Restore
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (window.confirm("Disable this student?")) { handleDeleteStudent(student._id); setShowDropdown(null); } }}
-                className="w-full px-3 sm:px-5 py-2 sm:py-3 text-left hover:bg-gray-100 text-red-600 flex items-center gap-2 sm:gap-3"
-              >
-                <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" /> Disable
-              </button>
-            )}
-          </div>
-        )}
-      </div>
 
-      <div className="space-y-2 sm:space-y-3 text-sm sm:text-base lg:text-lg text-gray-700">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <Mail className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> 
-          <span className="truncate">{student.email}</span>
+        <div className="space-y-2 sm:space-y-3 text-sm sm:text-base lg:text-lg text-gray-700">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Mail className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> 
+            <span className="truncate">{student.email}</span>
+          </div>
+          {student.campus?.name && (
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Building className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> 
+              <span className="truncate">{student.campus.name}</span>
+            </div>
+          )}
+          {student.program?.title && (
+            <div className="flex items-center gap-2 sm:gap-3">
+              <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> 
+              <span className="truncate">{student.program.title}</span>
+            </div>
+          )}
+          {student.group?.name && (
+            <div className="flex items-center gap-2 sm:gap-3">
+              <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> 
+              <span className="truncate">{student.group.name}</span>
+            </div>
+          )}
         </div>
-        {student.campus?.name && (
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Building className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> 
-            <span className="truncate">{student.campus.name}</span>
-          </div>
-        )}
-        {student.program?.title && (
-          <div className="flex items-center gap-2 sm:gap-3">
-            <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> 
-            <span className="truncate">{student.program.title}</span>
-          </div>
-        )}
-        {student.group?.name && (
-          <div className="flex items-center gap-2 sm:gap-3">
-            <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> 
-            <span className="truncate">{student.group.name}</span>
-          </div>
-        )}
       </div>
-    </div>
-  );
+    );
 
   // Skeleton Loader
   const SkeletonCard = () => (
