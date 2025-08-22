@@ -50,9 +50,6 @@ const StudentCreate = ({ onSuccess }) => {
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create student');
     }
-    finally {
-      setLoading(false);
-    }
   };
 
   return (
