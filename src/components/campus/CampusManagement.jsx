@@ -1,5 +1,5 @@
 // components/campus/CampusManagement.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Edit,
   Trash2,
@@ -14,6 +14,7 @@ import {
   UserPlus,
   AlertCircle,
   X,
+  CreditCard,
 } from "lucide-react";
 
 import CampusCreate from "./CampusCreate";
@@ -34,6 +35,9 @@ const CampusManagement = () => {
   const [selectedCampus, setSelectedCampus] = useState(null);
 
   const [stats, setStats] = useState({ total: 0, active: 0, disabled: 0 });
+  
+  // Add ref for dropdown positioning
+  const dropdownRefs = useRef({});
 
   // Fetch campuses
   const fetchCampuses = async () => {
@@ -59,6 +63,25 @@ const CampusManagement = () => {
     }
   };
 
+  // Handle dropdown toggle with proper event handling
+  const handleDropdownToggle = (e, campusId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowDropdown(showDropdown === campusId ? null : campusId);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showDropdown && !event.target.closest('.dropdown-container')) {
+        setShowDropdown(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showDropdown]);
+
   // Skeleton Card - Made responsive
   const SkeletonCard = () => (
     <div className="bg-white rounded-xl lg:rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-200 animate-pulse">
@@ -75,7 +98,10 @@ const CampusManagement = () => {
   );
 
   // Disable campus (soft delete)
-  const handleDeleteCampus = async (id) => {
+  const handleDeleteCampus = async (e, id) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(`${API_BASE_URL}/campus/${id}`, {
@@ -94,11 +120,16 @@ const CampusManagement = () => {
       }));
     } catch {
       setError("Failed to disable campus");
+    } finally {
+      setShowDropdown(null);
     }
   };
 
   // Restore campus
-  const handleRestoreCampus = async (id) => {
+  const handleRestoreCampus = async (e, id) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(`${API_BASE_URL}/campus/restore/${id}`, {
@@ -118,14 +149,35 @@ const CampusManagement = () => {
       }));
     } catch {
       setError("Failed to restore campus");
+    } finally {
+      setShowDropdown(null);
     }
+  };
+
+  // Handle edit click
+  const handleEditClick = (e, campus) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setSelectedCampus(campus);
+    setIsEditOpen(true);
+    setShowDropdown(null);
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
   };
 
   const filteredCampuses = campuses.filter(campus => {
     const matchesSearch =
       campus.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       campus.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      campus.zimedaar?.toLowerCase().includes(searchTerm.toLowerCase());
+      campus.zimedaar?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      String(formatDate(campus.founding_Date)).toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesFilter =
       filterStatus === "all" ||
@@ -150,7 +202,7 @@ const CampusManagement = () => {
     </div>
   );
 
-  // Campus Card - Improved mobile layout
+  // Campus Card - Fixed dropdown positioning
   const CampusCard = ({ campus }) => (
     <div className={`bg-white rounded-xl lg:rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-200 relative transition transform hover:shadow-2xl hover:-translate-y-1 ${
       campus.isDeleted ? "opacity-70" : ""
@@ -173,37 +225,53 @@ const CampusManagement = () => {
             </span>
           </div>
         </div>
-        <button 
-          onClick={() => setShowDropdown(showDropdown === campus._id ? null : campus._id)}
-          className="p-1 hover:bg-gray-100 rounded-md flex-shrink-0"
-        >
-          <MoreVertical className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500" />
-        </button>
-        {showDropdown === campus._id && (
-          <div className="absolute right-2 sm:right-6 top-12 sm:top-14 bg-white rounded-lg shadow-xl border py-2 sm:py-3 z-20 w-40 sm:w-48 text-sm sm:text-lg">
-            <button
-              onClick={() => { setSelectedCampus(campus); setIsEditOpen(true); setShowDropdown(null); }}
-              className="w-full px-3 sm:px-5 py-2 sm:py-3 text-left hover:bg-gray-100 flex items-center gap-2 sm:gap-3"
-            >
-              <Edit className="w-4 h-4 sm:w-5 sm:h-5" /> Edit
-            </button>
-            {campus.isDeleted ? (
+        
+        {/* Improved dropdown container */}
+        <div className="dropdown-container relative flex-shrink-0">
+          <button 
+            type="button"
+            onClick={(e) => handleDropdownToggle(e, campus._id)}
+            className="p-1 hover:bg-gray-100 rounded-md transition-colors duration-150"
+          >
+            <MoreVertical className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500" />
+          </button>
+          
+          {/* Fixed dropdown positioning */}
+          {showDropdown === campus._id && (
+            <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-30 w-40 sm:w-48 text-sm sm:text-base">
               <button
-                onClick={() => { handleRestoreCampus(campus._id); setShowDropdown(null); }}
-                className="w-full px-3 sm:px-5 py-2 sm:py-3 text-left hover:bg-gray-100 text-blue-600 flex items-center gap-2 sm:gap-3"
+                type="button"
+                onClick={(e) => handleEditClick(e, campus)}
+                className="w-full px-3 sm:px-4 py-2 text-left hover:bg-gray-100 flex items-center gap-2 sm:gap-3 text-gray-700 transition-colors duration-150"
               >
-                <RefreshCcw className="w-4 h-4 sm:w-5 sm:h-5" /> Restore
+                <Edit className="w-4 h-4 sm:w-5 sm:h-5" /> Edit
               </button>
-            ) : (
-              <button
-                onClick={() => { if (window.confirm("Disable this campus?")) { handleDeleteCampus(campus._id); setShowDropdown(null); }}}
-                className="w-full px-3 sm:px-5 py-2 sm:py-3 text-left hover:bg-gray-100 text-red-600 flex items-center gap-2 sm:gap-3"
-              >
-                <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" /> Disable
-              </button>
-            )}
-          </div>
-        )}
+              {campus.isDeleted ? (
+                <button
+                  type="button"
+                  onClick={(e) => handleRestoreCampus(e, campus._id)}
+                  className="w-full px-3 sm:px-4 py-2 text-left hover:bg-gray-100 text-blue-600 flex items-center gap-2 sm:gap-3 transition-colors duration-150"
+                >
+                  <RefreshCcw className="w-4 h-4 sm:w-5 sm:h-5" /> Restore
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    if (window.confirm("Disable this campus?")) {
+                      handleDeleteCampus(e, campus._id);
+                    } else {
+                      setShowDropdown(null);
+                    }
+                  }}
+                  className="w-full px-3 sm:px-4 py-2 text-left hover:bg-gray-100 text-red-600 flex items-center gap-2 sm:gap-3 transition-colors duration-150"
+                >
+                  <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" /> Disable
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="space-y-2 sm:space-y-3 text-sm sm:text-base lg:text-lg text-gray-700">
@@ -217,6 +285,13 @@ const CampusManagement = () => {
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <Users className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> 
             <span className="truncate">{campus.zimedaar}</span>
+          </div>
+        )}
+        
+        {campus.founding_date && (
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> 
+            <span className="truncate">{formatDate(campus.founding_date)}</span>
           </div>
         )}
       </div>

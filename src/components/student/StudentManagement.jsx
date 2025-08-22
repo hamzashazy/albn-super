@@ -175,43 +175,33 @@ const StudentManagement = () => {
           </div>
         </div>
         <button
+          type="button"
           className="flex-shrink-0 p-1"
-          onClick={() =>
-            setShowDropdown(showDropdown === student._id ? null : student._id)
-          }
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowDropdown(showDropdown === student._id ? null : student._id); }}
         >
           <MoreVertical className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500" />
         </button>
         {showDropdown === student._id && (
           <div className="absolute right-4 sm:right-6 top-12 sm:top-14 bg-white rounded-lg shadow-xl border py-2 sm:py-3 z-20 w-40 sm:w-48 text-sm sm:text-lg">
             <button
-              onClick={() => {
-                setSelectedStudent(student);
-                setIsEditOpen(true);
-                setShowDropdown(null);
-              }}
+              type="button"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setSelectedStudent(student); setIsEditOpen(true); setShowDropdown(null); }}
               className="w-full px-3 sm:px-5 py-2 sm:py-3 text-left hover:bg-gray-100 flex items-center gap-2 sm:gap-3"
             >
               <Edit className="w-4 h-4 sm:w-5 sm:h-5" /> Edit
             </button>
             {student.isDeleted ? (
               <button
-                onClick={() => {
-                  handleRestoreStudent(student._id);
-                  setShowDropdown(null);
-                }}
+                type="button"
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleRestoreStudent(student._id); setShowDropdown(null); }}
                 className="w-full px-3 sm:px-5 py-2 sm:py-3 text-left hover:bg-gray-100 text-blue-600 flex items-center gap-2 sm:gap-3"
               >
                 <RefreshCcw className="w-4 h-4 sm:w-5 sm:h-5" /> Restore
               </button>
             ) : (
               <button
-                onClick={() => {
-                  if (window.confirm("Disable this student?")) {
-                    handleDeleteStudent(student._id);
-                    setShowDropdown(null);
-                  }
-                }}
+                type="button"
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (window.confirm("Disable this student?")) { handleDeleteStudent(student._id); setShowDropdown(null); } }}
                 className="w-full px-3 sm:px-5 py-2 sm:py-3 text-left hover:bg-gray-100 text-red-600 flex items-center gap-2 sm:gap-3"
               >
                 <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" /> Disable

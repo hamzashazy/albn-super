@@ -181,9 +181,8 @@ const GroupManagement = () => {
 
         {/* Dropdown */}
         <button
-          onClick={() =>
-            setShowDropdown(showDropdown === group._id ? null : group._id)
-          }
+          type="button"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowDropdown(showDropdown === group._id ? null : group._id); }}
           className="p-1 hover:bg-gray-100 rounded-md flex-shrink-0"
         >
           <MoreVertical className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500" />
@@ -192,33 +191,24 @@ const GroupManagement = () => {
         {showDropdown === group._id && (
           <div className="absolute right-2 sm:right-6 top-12 sm:top-14 bg-white rounded-lg shadow-xl border py-2 sm:py-3 z-20 w-40 sm:w-48 text-sm sm:text-lg">
             <button
-              onClick={() => {
-                setSelectedGroup(group);
-                setIsEditOpen(true);
-                setShowDropdown(null);
-              }}
+              type="button"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setSelectedGroup(group); setIsEditOpen(true); setShowDropdown(null); }}
               className="w-full px-3 sm:px-5 py-2 sm:py-3 text-left hover:bg-gray-100 flex items-center gap-2 sm:gap-3"
             >
               <Edit className="w-4 h-4 sm:w-5 sm:h-5" /> Edit
             </button>
             {group.isDeleted ? (
               <button
-                onClick={() => {
-                  handleEnable(group._id);
-                  setShowDropdown(null);
-                }}
+                type="button"
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleEnable(group._id); setShowDropdown(null); }}
                 className="w-full px-3 sm:px-5 py-2 sm:py-3 text-left hover:bg-gray-100 text-blue-600 flex items-center gap-2 sm:gap-3"
               >
                 <RefreshCcw className="w-4 h-4 sm:w-5 sm:h-5" /> Restore
               </button>
             ) : (
               <button
-                onClick={() => {
-                  if (window.confirm("Disable this group?")) {
-                    handleDisable(group._id);
-                    setShowDropdown(null);
-                  }
-                }}
+                type="button"
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (window.confirm("Disable this group?")) { handleDisable(group._id); setShowDropdown(null); } }}
                 className="w-full px-3 sm:px-5 py-2 sm:py-3 text-left hover:bg-gray-100 text-red-600 flex items-center gap-2 sm:gap-3"
               >
                 <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" /> Disable
