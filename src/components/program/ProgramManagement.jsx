@@ -28,6 +28,7 @@ const ProgramManagement = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [campusFilter, setCampusFilter] = useState("all");
   const [showDropdown, setShowDropdown] = useState(null);
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -35,6 +36,7 @@ const ProgramManagement = () => {
   const [selectedProgram, setSelectedProgram] = useState(null);
 
   const [stats, setStats] = useState({ total: 0, active: 0, disabled: 0 });
+  const [campuses, setCampuses] = useState([]);
 
   // Fetch programs
   const fetchPrograms = async () => {
@@ -58,6 +60,18 @@ const ProgramManagement = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Fetch campuses for filter dropdown
+  const fetchCampuses = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_BASE_URL}/campus/active`, { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) {
+        const data = await res.json();
+        setCampuses(Array.isArray(data) ? data : []);
+      }
+    } catch {}
   };
 
   // Soft delete
@@ -129,10 +143,13 @@ const ProgramManagement = () => {
       (filterStatus === "active" && !program.isDeleted) ||
       (filterStatus === "disabled" && program.isDeleted);
 
-    return matchesSearch && matchesFilter;
+    const matchesCampus =
+      campusFilter === "all" || (typeof program.campus === 'string' ? program.campus === campusFilter : program.campus?._id === campusFilter);
+
+    return matchesSearch && matchesFilter && matchesCampus;
   });
 
-  useEffect(() => { fetchPrograms(); }, []);
+  useEffect(() => { fetchPrograms(); fetchCampuses(); }, []);
 
   // Stats Card - Made more responsive
   const StatsCard = ({ icon: Icon, label, value, color }) => (
@@ -297,6 +314,16 @@ const ProgramManagement = () => {
                 <option value="all">All Status</option>
                 <option value="active">Active Only</option>
                 <option value="disabled">Disabled Only</option>
+              </select>
+              <select
+                value={campusFilter}
+                onChange={(e) => setCampusFilter(e.target.value)}
+                className="flex-1 sm:flex-none px-4 sm:px-5 py-3 sm:py-4 rounded-lg border border-gray-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200 text-base sm:text-lg lg:text-xl"
+              >
+                <option value="all">All Campuses</option>
+                {campuses.map(c => (
+                  <option key={c._id} value={c._id}>{c.name}</option>
+                ))}
               </select>
               <button
                 onClick={fetchPrograms}

@@ -25,6 +25,8 @@ const GroupManagement = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [campusFilter, setCampusFilter] = useState("all");
+  const [campuses, setCampuses] = useState([]);
   const [showDropdown, setShowDropdown] = useState(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -52,6 +54,19 @@ const GroupManagement = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchCampuses = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`https://albn-backend.vercel.app/api/campus/active`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setCampuses(Array.isArray(data) ? data : []);
+      }
+    } catch {}
   };
 
   // Group Skeleton - Made responsive
@@ -125,11 +140,15 @@ const GroupManagement = () => {
       (filterStatus === "active" && !group.isDeleted) ||
       (filterStatus === "disabled" && group.isDeleted);
 
-    return matchesSearch && matchesStatus;
+    const matchesCampus =
+      campusFilter === "all" || (typeof group.campus === 'string' ? group.campus === campusFilter : group.campus?._id === campusFilter);
+
+    return matchesSearch && matchesStatus && matchesCampus;
   });
 
   useEffect(() => {
     fetchGroups();
+    fetchCampuses();
   }, []);
 
   // Stats Card - Made responsive
@@ -307,6 +326,16 @@ const GroupManagement = () => {
                 <option value="all">All Status</option>
                 <option value="active">Active Only</option>
                 <option value="disabled">Disabled Only</option>
+              </select>
+              <select
+                value={campusFilter}
+                onChange={(e) => setCampusFilter(e.target.value)}
+                className="flex-1 sm:flex-none px-4 sm:px-5 py-3 sm:py-4 rounded-lg border border-gray-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200 text-base sm:text-lg lg:text-xl"
+              >
+                <option value="all">All Campuses</option>
+                {campuses.map(c => (
+                  <option key={c._id} value={c._id}>{c.name}</option>
+                ))}
               </select>
               <button
                 onClick={fetchGroups}
