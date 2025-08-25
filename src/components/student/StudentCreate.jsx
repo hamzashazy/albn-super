@@ -5,11 +5,12 @@ const API_BASE_URL = 'https://albn-backend.vercel.app/api';
 
 const StudentCreate = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
-    name: '', email: '', password: '', campus: '', program: '', group: ''
+    name: '', email: '', password: '', campus: '', program: '', group: '', batch: ''
   });
 
   const [campuses, setCampuses] = useState([]);
   const [programs, setPrograms] = useState([]);
+  const [batches, setBatches] = useState([]);
   const [groups, setGroups] = useState([]);
   const [error, setError] = useState(null);
 
@@ -28,6 +29,7 @@ const StudentCreate = ({ onSuccess }) => {
   useEffect(() => {
     fetchData('campus', setCampuses);
     fetchData('program', setPrograms);
+    fetchData('batch', setBatches);
     fetchData('group', setGroups);
   }, []);
 
@@ -70,6 +72,12 @@ const StudentCreate = ({ onSuccess }) => {
         <select name="program" value={formData.program} onChange={handleChange} required className="w-full p-4 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm transition">
           <option value="">Select Program</option>
           {programs.map(p => <option key={p._id} value={p._id}>{p.title}</option>)}
+        </select>
+
+        {/* Batch Dropdown */}
+        <select name="batch" value={formData.batch} onChange={handleChange} required className="w-full p-4 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm transition">
+          <option value="">Select Batch</option>
+          {batches.map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
         </select>
 
         {/* Group Dropdown */}

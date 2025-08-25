@@ -9,6 +9,7 @@ import {
   Menu,
   X,
   Bell,
+  Layers,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -17,6 +18,7 @@ import CampusManagement from "./campus/CampusManagement.jsx";
 import ProgramManagement from "./program/ProgramManagement.jsx";
 import StudentManagement from "./student/StudentManagement.jsx";
 import GroupManagement from "./group/GroupManagement.jsx";
+import BatchManagement from "./batch/BatchManagement.jsx";
 import NotificationManagement from "./notification/NotificationManagement.jsx";
 
 const Superpanel = () => {
@@ -43,6 +45,13 @@ const Superpanel = () => {
       title: "Programs",
       icon: <BookOpen className="w-7 h-7" />,
       component: <ProgramManagement />,
+      gradient: "from-purple-500 to-pink-600",
+    },
+    {
+      key: "batch",
+      title: "Batches",
+      icon: <Layers className="w-7 h-7" />,
+      component: <BatchManagement />,
       gradient: "from-purple-500 to-pink-600",
     },
     {

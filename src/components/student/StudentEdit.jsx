@@ -12,10 +12,12 @@ const StudentEdit = ({ studentId, onClose, onSuccess }) => {
     campus: "",
     program: "",
     group: "",
+    batch: "",
   });
 
   const [campuses, setCampuses] = useState([]);
   const [programs, setPrograms] = useState([]);
+  const [batches, setBatches] = useState([]);
   const [groups, setGroups] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -30,10 +32,11 @@ const StudentEdit = ({ studentId, onClose, onSuccess }) => {
 
     const loadData = async () => {
       try {
-        const [studentRes, campusesRes, programsRes, groupsRes] = await Promise.all([
+        const [studentRes, campusesRes, programsRes, batchesRes, groupsRes] = await Promise.all([
           axios.get(`${API_BASE_URL}/student/${studentId}`, { headers: { Authorization: `Bearer ${token}` } }),
           axios.get(`${API_BASE_URL}/campus/active`, { headers: { Authorization: `Bearer ${token}` } }),
           axios.get(`${API_BASE_URL}/program/active`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${API_BASE_URL}/batch/active`, { headers: { Authorization: `Bearer ${token}` } }),
           axios.get(`${API_BASE_URL}/group/active`, { headers: { Authorization: `Bearer ${token}` } }),
         ]);
 
@@ -43,11 +46,13 @@ const StudentEdit = ({ studentId, onClose, onSuccess }) => {
           password: "",
           campus: studentRes.data.campus?._id || "",
           program: studentRes.data.program?._id || "",
+          batch: studentRes.data.batch?._id || "",
           group: studentRes.data.group?._id || "",
         });
 
         setCampuses(campusesRes.data);
         setPrograms(programsRes.data);
+        setBatches(batchesRes.data);
         setGroups(groupsRes.data);
       } catch {
         setError("Failed to load student or dropdown data");
@@ -137,6 +142,17 @@ const StudentEdit = ({ studentId, onClose, onSuccess }) => {
         >
           <option value="">Select Program</option>
           {programs.map(p => <option key={p._id} value={p._id}>{p.title}</option>)}
+        </select>
+        
+        <select 
+          name="batch" 
+          value={formData.batch} 
+          onChange={handleChange} 
+          required 
+          className="w-full p-4 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 shadow-sm transition"
+        >
+          <option value="">Select Batch</option>
+          {batches.map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
         </select>
 
         <select 
